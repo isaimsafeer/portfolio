@@ -24,13 +24,54 @@ const projects = [
     accent: "cyan",
   },
   {
-    title: "Selenium Automation Suite",
+    title: "Multi-Agent Company Survey Analysis System",
     description:
-      "Robust web automation framework for enterprise-scale data extraction, form automation, and workflow testing across complex web applications with anti-detection measures.",
-    techStack: ["Python", "Selenium", "Playwright", "Docker", "PostgreSQL"],
+      "Built a CrewAI-based multi-agent system to analyze company survey data, extract insights, detect sentiment trends, and generate executive-level reports for decision-making.",
+    techStack: [
+      "Python",
+      "CrewAI",
+      "LangGraph",
+      "Pandas",
+      "OpenAI GPT",
+      "FastAPI",
+    ],
     githubUrl: "https://github.com/isaimsafeer",
     demoUrl: undefined,
-    icon: "⚙️",
+    icon: "📊",
+    accent: "blue",
+  },
+  {
+    title: "RAG Blueprint Knowledge Chatbot",
+    description:
+      "Developed a Retrieval-Augmented Generation chatbot trained on technical blueprints and structured documentation, enabling precise engineering Q&A and contextual retrieval.",
+    techStack: [
+      "LangChain",
+      "Pinecone",
+      "FAISS",
+      "FastAPI",
+      "OpenAI GPT",
+      "Python",
+    ],
+    githubUrl: "https://github.com/isaimsafeer",
+    demoUrl: undefined,
+    icon: "🏗️",
+    accent: "indigo",
+  },
+  {
+    title: "Sales Call Transcription & KPI Scoring System",
+    description:
+      "Built an AI system that transcribes sales calls, analyzes conversation quality, and generates KPI-based performance scores including objection handling, pitch quality, and closing effectiveness.",
+    techStack: [
+      "Whisper",
+      "Python",
+      "FastAPI",
+      "NLP",
+      "OpenAI GPT",
+      "PostgreSQL",
+    ],
+    githubUrl: "https://github.com/isaimsafeer",
+    demoUrl: undefined,
+    icon: "📞",
     accent: "emerald",
   },
   {
@@ -114,6 +155,10 @@ const accentStyles: Record<
     hover: "hover:border-teal-500/30 hover:bg-teal-500/[0.06]",
     badge: "bg-teal-500/10 text-teal-300 border-teal-500/20",
   },
+  indigo: {
+    hover: "hover:border-indigo-500/30 hover:bg-indigo-500/[0.06]",
+    badge: "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
+  },
 };
 
 export default function Projects() {
@@ -146,7 +191,7 @@ export default function Projects() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {projects.map((project, i) => {
-            const styles = accentStyles[project.accent];
+            const styles = accentStyles[project.accent] ?? accentStyles.violet;
             return (
               <motion.div
                 key={project.title}

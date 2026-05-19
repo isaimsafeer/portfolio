@@ -27,19 +27,23 @@ export default function Navbar() {
 
   useEffect(() => {
     const ids = navLinks.map((l) => l.href.slice(1));
-    const observers = ids.map((id) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActive(id);
-        },
-        { threshold: 0.25, rootMargin: "-10% 0px -70% 0px" }
-      );
-      obs.observe(el);
-      return obs;
-    });
-    return () => observers.forEach((o) => o?.disconnect());
+
+    const detectActive = () => {
+      const threshold = 120;
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= threshold) {
+          current = id;
+        }
+      }
+      setActive(current);
+    };
+
+    detectActive();
+    window.addEventListener("scroll", detectActive, { passive: true });
+    return () => window.removeEventListener("scroll", detectActive);
   }, []);
 
   useEffect(() => {

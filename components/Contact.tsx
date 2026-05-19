@@ -32,6 +32,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -39,13 +40,26 @@ export default function Contact() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    setError("");
+    try {
+      const res = await fetch("https://formspree.io/f/mnjrnlka", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setError("Something went wrong. Please try again or email me directly.");
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
       setLoading(false);
-      setSubmitted(true);
-    }, 1000);
+    }
   }
 
   return (
@@ -220,6 +234,11 @@ export default function Contact() {
                       className="w-full bg-white/[0.03] border border-white/[0.08] focus:border-violet-500/50 outline-none rounded-xl px-4 py-2.5 text-[#E5E7EB] text-sm placeholder-[#9CA3AF]/40 transition-colors duration-200 resize-none"
                     />
                   </div>
+                  {error && (
+                    <p className="text-red-400 text-xs leading-relaxed -mt-1">
+                      {error}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     disabled={loading}
