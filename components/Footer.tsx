@@ -38,7 +38,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-[#9CA3AF]/40 text-xs text-center md:text-right">
-            © {year} Saim Safeer. Built with Next.js &amp; Framer Motion.
+            © {year} Saim Safeer. All rights reserved.
           </p>
         </div>
       </div>
