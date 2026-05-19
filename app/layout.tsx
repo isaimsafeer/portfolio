@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CustomCursor from "@/components/CustomCursor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,22 +16,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Saim Safeer — Full Stack AI & ML Engineer",
+  title: "Saim Safeer — AI Developer & Automation Engineer",
   description:
-    "Portfolio of Saim Safeer, a Full Stack AI & ML Engineer specializing in RAG pipelines, LLM applications, and production-ready AI systems.",
+    "Portfolio of Saim Safeer — AI Developer, Automation Engineer, Full Stack Developer, and RAG & AI Agent specialist building production-ready intelligent systems.",
+  keywords: [
+    "AI Developer",
+    "RAG",
+    "LangChain",
+    "LangGraph",
+    "Automation Engineer",
+    "Full Stack",
+    "AI Agents",
+    "Python",
+  ],
+  openGraph: {
+    title: "Saim Safeer — AI Developer & Automation Engineer",
+    description:
+      "Building production-ready AI systems, automation pipelines, and full-stack applications.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="flex flex-col min-h-screen">
+        <CustomCursor />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

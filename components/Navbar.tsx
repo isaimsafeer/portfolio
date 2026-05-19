@@ -1,117 +1,117 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
+  { label: "Companies", href: "#companies" },
   { label: "Projects", href: "#projects" },
+  { label: "Skills", href: "#skills" },
+  { label: "Experience", href: "#experience" },
   { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState("home");
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setMenuOpen(false);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
+    const ids = navLinks.map((l) => l.href.slice(1));
+    const observers = ids.map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActive(id);
+        },
+        { threshold: 0.25, rootMargin: "-10% 0px -70% 0px" }
+      );
+      obs.observe(el);
+      return obs;
+    });
+    return () => observers.forEach((o) => o?.disconnect());
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768) setMenuOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   return (
-    <header className="fixed top-2 left-1/2 -translate-x-1/2 z-50 w-[95vw] min-w-[380px] max-w-[1440px]">
-      {/* Main pill bar */}
-      <nav
-        className={`relative flex items-center h-16 px-4 ring-2 backdrop-blur-md shadow-[0_10px_20px_-10px_black] transition-all duration-300
-          ${darkMode
-            ? "bg-black/80 ring-blue-500/40"
-            : "bg-white/80 ring-blue-400/50"
-          }
-          ${menuOpen ? "rounded-3xl" : "rounded-full"}
-        `}
-      >
-        {/* Brand */}
-        <div className={`flex items-center gap-2 border rounded-full px-3 py-1.5 absolute left-4 top-1/2 -translate-y-1/2
-          ${darkMode
-            ? "bg-blue-500/20 border-blue-400/40"
-            : "bg-blue-100/80 border-blue-300/60"
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="fixed top-0 left-0 right-0 z-50 px-4 pt-4"
+    >
+      <div className="max-w-7xl mx-auto">
+        <nav
+          className={`flex items-center justify-between px-5 py-3 rounded-2xl border transition-all duration-300 ${
+            scrolled
+              ? "bg-[#0B0F19]/80 border-violet-500/20 backdrop-blur-xl shadow-xl shadow-black/30"
+              : "bg-transparent border-transparent"
           }`}
         >
-          {/* Brand icon */}
+          {/* Logo */}
           <Link
             href="/"
-            className={`font-bold text-base tracking-tight whitespace-nowrap ${darkMode ? "text-white" : "text-gray-900"}`}
-            onClick={() => setMenuOpen(false)}
+            className="text-[#E5E7EB] font-bold text-base tracking-tight shrink-0"
           >
-            Saim
+            <span className="text-violet-400">S</span>aim{" "}
+            <span className="text-[#9CA3AF] font-medium">Safeer</span>
           </Link>
-        </div>
 
-        {/* Desktop nav — centered */}
-        <ul className="hidden md:flex items-center gap-6 lg:gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 m-0 p-0 list-none">
-          {navLinks.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                className={`text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200
-                  ${darkMode
-                    ? "text-blue-100/80 hover:text-white hover:bg-blue-500/25"
-                    : "text-gray-700 hover:text-blue-700 hover:bg-blue-100/70"
+          {/* Desktop links */}
+          <ul className="hidden md:flex items-center gap-1 list-none m-0 p-0">
+            {navLinks.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  className={`relative px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                    active === link.href.slice(1)
+                      ? "text-white"
+                      : "text-[#9CA3AF] hover:text-[#E5E7EB]"
                   }`}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+                >
+                  {active === link.href.slice(1) && (
+                    <motion.span
+                      layoutId="activeNav"
+                      className="absolute inset-0 bg-violet-500/20 rounded-lg"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{link.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
 
-        {/* Right side: Theme toggle + hamburger */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-3">
-
-          {/* Light / Dark toggle pill */}
-          <button
-            aria-label="Toggle theme"
-            onClick={() => setDarkMode((v) => !v)}
-            className={`hidden md:flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-medium transition-all duration-200
-              ${darkMode
-                ? "bg-blue-500/20 border-blue-400/40 text-blue-200 hover:bg-blue-500/35"
-                : "bg-blue-100 border-blue-300/60 text-blue-700 hover:bg-blue-200"
-              }`}
+          {/* Desktop CTA */}
+          <a
+            href="#contact"
+            className="hidden md:flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-violet-500/25 hover:-translate-y-px shrink-0"
           >
-            {darkMode ? (
-              <>
-                {/* Sun icon */}
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <circle cx="12" cy="12" r="5" />
-                  <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-                Light
-              </>
-            ) : (
-              <>
-                {/* Moon icon */}
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-                </svg>
-                Dark
-              </>
-            )}
-          </button>
+            Hire Me
+          </a>
 
-          {/* Mobile toggle */}
+          {/* Mobile hamburger */}
           <button
-            aria-label="Toggle menu"
-            className={`md:hidden transition-colors ${darkMode ? "text-white hover:text-blue-300" : "text-gray-800 hover:text-blue-600"}`}
             onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden text-[#9CA3AF] hover:text-white transition-colors p-1"
+            aria-label="Toggle menu"
           >
             <svg
               className="w-6 h-6"
@@ -121,68 +121,59 @@ export default function Navbar() {
               strokeWidth={1.8}
             >
               {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </svg>
           </button>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Mobile dropdown */}
-      {menuOpen && (
-        <div className={`md:hidden mt-2 mx-2 rounded-2xl backdrop-blur-md ring-2 shadow-[0_10px_20px_-10px_black] px-6 py-4 flex flex-col gap-1
-          ${darkMode
-            ? "bg-black/90 ring-blue-500/30"
-            : "bg-white/95 ring-blue-300/40"
-          }`}
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200
-                ${darkMode
-                  ? "text-blue-100/80 hover:text-white hover:bg-blue-500/25"
-                  : "text-gray-700 hover:text-blue-700 hover:bg-blue-100"
-                }`}
-              onClick={() => setMenuOpen(false)}
+        {/* Mobile dropdown */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.97 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="md:hidden mt-2 bg-[#0B0F19]/95 border border-violet-500/20 backdrop-blur-xl rounded-2xl px-3 py-3"
             >
-              {link.label}
-            </a>
-          ))}
-
-          {/* Mobile theme toggle */}
-          <div className={`border-t mt-2 pt-3 ${darkMode ? "border-blue-500/20" : "border-blue-200/50"}`}>
-            <button
-              onClick={() => setDarkMode((v) => !v)}
-              className={`flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 w-full
-                ${darkMode
-                  ? "text-blue-200 hover:bg-blue-500/25"
-                  : "text-blue-700 hover:bg-blue-100"
-                }`}
-            >
-              {darkMode ? (
-                <>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <circle cx="12" cy="12" r="5" />
-                    <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                  </svg>
-                  Switch to Light
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-                  </svg>
-                  Switch to Dark
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-    </header>
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-4 py-2.5 text-sm font-medium rounded-xl transition-colors duration-200 ${
+                    active === link.href.slice(1)
+                      ? "text-white bg-violet-500/20"
+                      : "text-[#9CA3AF] hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="mt-2 pt-2 border-t border-white/[0.07]">
+                <a
+                  href="#contact"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl text-center transition-colors"
+                >
+                  Hire Me
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.header>
   );
 }
